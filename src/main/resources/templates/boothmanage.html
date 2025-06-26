@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ブース個数管理</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+select, input[type="number"] {
+    width: 100%;
+    padding: 15px 20px;
+    border: 2px solid #e1e5e9;
+    border-radius: 12px;
+    font-size: 16px;
+    background: white;
+    transition: all 0.3s ease;
+    appearance: none;
+}
+
+select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 45px;
+}
+
+select:focus, input[type="number"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+}
+
+select:hover, input[type="number"]:hover {
+    border-color: #c4c4c4;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.submit-btn:active {
+    transform: translateY(-1px);
+}
+
+.icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+/* アニメーション効果 */
+.container {
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 600px) {
+    .container {
+        padding: 30px 25px;
+        margin: 10px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    h2 {
+        font-size: 24px;
+    }
+}
+
+/* バリデーション表示 */
+.error {
+    border-color: #e53e3e !important;
+    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1) !important;
+}
+
+.success {
+    border-color: #38a169 !important;
+    box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.1) !important;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+    <form action="/boothsubmit" method="post" id="boothForm">
+        <h2>🏢 ブース個数管理</h2>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="building">
+                    <span class="icon">🏬</span>号館を選択
+                </label>
+                <select id="building" name="building" required>
+                    <option value="">選択してください</option>
+                    <option value="1">1号館</option>
+                    <option value="2">2号館</option>
+                    <option value="3">3号館</option>
+                    <option value="4">4号館</option>
+                    <option value="5">5号館</option>
+                    <option value="6">6号館</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="floor">
+                    <span class="icon">🏗️</span>階数を選択
+                </label>
+                <select id="floor" name="floor" required>
+                    <option value="">選択してください</option>
+                    <option value="1F">1階</option>
+                    <option value="2F">2階</option>
+                    <option value="3F">3階</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="number">
+                <span class="icon">🔢</span>番号
+            </label>
+            <input type="number" id="number" name="number" placeholder="例: 1" required min="1" max="999">
+        </div>
+
+        <button type="submit" class="submit-btn">
+            ✅ 決定
+        </button>
+    </form>
+</div>
+
+<script>
+// フォームのバリデーションとユーザビリティの向上
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('boothForm');
+    const inputs = form.querySelectorAll('select, input');
+    
+    // リアルタイムバリデーション
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.classList.contains('error')) {
+                validateField(this);
+            }
+        });
+    });
+    
+    function validateField(field) {
+        if (field.checkValidity()) {
+            field.classList.remove('error');
+            field.classList.add('success');
+        } else {
+            field.classList.remove('success');
+            field.classList.add('error');
+        }
+    }
+    
+    // フォーム送信時の処理
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        inputs.forEach(input => {
+            validateField(input);
+            if (!input.checkValidity()) {
+                isValid = false;
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            // 最初のエラーフィールドにフォーカス
+            const firstError = form.querySelector('.error');
+            if (firstError) {
+                firstError.focus();
+            }
+        } else {
+            // 送信ボタンのローディング状態
+            const button = form.querySelector('.submit-btn');
+            button.innerHTML = '⏳ 処理中...';
+            button.disabled = true;
+        }
+    });
+    
+    // 数値入力の制限
+    const numberInput = document.getElementById('number');
+    numberInput.addEventListener('input', function() {
+        if (this.value.length > 3) {
+            this.value = this.value.slice(0, 3);
+        }
+    });
+});
+</script>
+</body>
+</html>

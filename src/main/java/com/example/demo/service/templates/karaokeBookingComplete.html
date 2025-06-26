@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>予約完了</title>
+</head>
+<body>
+    <h1>カラオケ予約が完了しました！</h1>
+
+    <p>以下の内容で予約を受け付けました：</p>
+    <ul>
+        <li>学籍番号：<span th:text="${studentId}"></span></li>
+        <li>予約日：<span th:text="${date}"></span></li>
+        <li>人数：<span th:text="${userNumber}"></span> 人</li>
+    </ul>
+    <a href="https://lin.ee/KSqIurt" 
+   target="_blank"
+   style="display: inline-block; padding: 10px 20px; background-color: #666666; color: white; text-decoration: none; border-radius: 5px;">
+    トークに戻る
+</a>
+    <a th:href="@{/karaokeBooking}">予約画面に戻る</a>
+</body>
+</html>

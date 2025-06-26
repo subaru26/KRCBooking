@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>予約履歴</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20% auto;
+            width: 300px;
+            text-align: center;
+        }
+        .modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- エラーメッセージ表示 -->
+    <h2 th:if="${errorMessage}" th:text="${errorMessage}"></h2>
+    
+    <!-- エラーメッセージ表示 -->
+    <h2 th:if="${message}" th:text="${message}"></h2>
+
+    <!-- ユーザー名表示 -->
+    <h2 th:if="${userName}" th:text="${userName + 'さんの予約'}"></h2>
+
+    <!-- 予約履歴一覧 -->
+    <div th:if="${bookings}">
+        <div th:each="booking : ${bookings}" th:classappend="${booking.canceled} ? 'canceled-block'">
+            <p class="booking-id">
+                予約ID：<span th:text="${booking.booking_id}"></span>
+                <span th:if="${booking.canceled}" style="color: red; font-weight: bold; margin-left: 10px;">
+                    （キャンセル済み）
+                </span>
+            </p>
+            <p class="booking-date">予約日：<span th:text="${#dates.format(booking.date, 'yyyy年MM月dd日')}"></span></p>
+            <p class="booking-place">場所：<span th:text="${booking.facilities_type}"></span></p>
+            <p class="booking-user" th:if="${booking.users_number != null}">
+                人数：<span th:text="${booking.users_number}"></span>人
+            </p>
+
+            <!-- キャンセルボタン -->
+            <form method="post" action="/cancel" class="cancel-form" th:if="${!booking.canceled}">
+                <input type="hidden" name="bookingId" th:value="${booking.booking_id}" />
+                <input type="hidden" name="lineId" th:value="${lineId}" />
+                <button type="button" onclick="confirmCancel(this)">キャンセル</button>
+            </form>
+            <hr>
+        </div>
+    </div>
+
+    <!-- キャンセル確認モーダル -->
+    <div class="modal-overlay" id="cancelModal">
+        <div class="modal-content">
+            <p>以下の予約をキャンセルしてもいいかなあ？</p>
+            <div id="cancel-details" style="text-align: left; font-size: 0.9em; margin-top: 10px;"></div>
+            <div class="modal-buttons">
+                <button onclick="submitCancel()">はい</button>
+                <button onclick="closeModal()">いいえ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- キャンセル完了モーダル -->
+    <div class="modal-overlay" id="messageModal" th:if="${message == '予約をキャンセルしました。'}">
+        <div class="modal-content">
+            <p th:text="${message}"></p>
+            <div class="modal-buttons">
+                <a th:href="@{'/reservationhistory'(lineId=${lineId})}"
+                   style="padding: 8px 16px; background-color: #ccc; border-radius: 5px; text-decoration: none;">
+                    閉じる
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCancelForm = null;
+
+        function confirmCancel(button) {
+    currentCancelForm = button.closest("form");
+
+    const bookingBlock = currentCancelForm.closest("div");
+    const bookingId = bookingBlock.querySelector(".booking-id span").textContent.trim();
+    const bookingDate = bookingBlock.querySelector(".booking-date span").textContent.trim();
+    const facilities = bookingBlock.querySelector(".booking-place span").textContent.trim();
+    const usersElem = bookingBlock.querySelector(".booking-user span");
+    const users = usersElem ? usersElem.textContent.trim() : null;
+
+    let detailHtml = `
+        <strong>予約ID：</strong>${bookingId}<br>
+        <strong>予約日：</strong>${bookingDate}<br>
+        <strong>場所：</strong>${facilities}
+    `;
+
+    if (users) {
+        detailHtml += `<br><strong>人数：</strong>${users}人`;
+    }
+
+    document.getElementById("cancel-details").innerHTML = detailHtml;
+    document.getElementById("cancelModal").style.display = "block";
+}
+
+
+        function closeModal() {
+            document.getElementById("cancelModal").style.display = "none";
+        }
+
+        function submitCancel() {
+            if (currentCancelForm) {
+                currentCancelForm.submit();
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const messageModal = document.getElementById("messageModal");
+            if (messageModal) {
+                messageModal.style.display = "block";
+            }
+        });
+    </script>
+
+</body>
+</html>

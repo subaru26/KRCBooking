@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>カレンダー予約ページ</title>
+  <style>
+    .full-date {
+      background-color: #f8d7da;
+      color: #721c24;
+      cursor: not-allowed !important;
+    }
+    .past-date {
+      background-color: #e0e0e0;
+      color: #999;
+      cursor: not-allowed;
+    }
+    .date-cell:hover:not(.full-date):not(.past-date) {
+      background-color: #eef;
+    }
+  </style>
+</head>
+<body style="font-family: sans-serif; padding: 10px;">
+  <h1 style="text-align: center; font-size: 1.5em;">予約カレンダー</h1>
+
+  <div style="text-align: center; margin-bottom: 10px;">
+    <button id="prev-month">＜</button>
+    <span id="month-year"></span>
+    <button id="next-month">＞</button>
+  </div>
+
+  <div id="calendar-container" style="overflow-x: auto;">
+    <table id="calendar" style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th>日</th>
+          <th>月</th>
+          <th>火</th>
+          <th>水</th>
+          <th>木</th>
+          <th>金</th>
+          <th>土</th>
+        </tr>
+      </thead>
+      <tbody id="calendar-body">
+        <!-- JavaScriptで生成 -->
+      </tbody>
+    </table>
+  </div>
+
+  <div id="reservation-form" style="margin-top: 20px;">
+    <h2 style="font-size: 1.2em;">予約フォーム</h2>
+
+    <div th:if="${errorMessage}" style="color: red;">
+      <p th:text="${errorMessage}"></p>
+    </div>
+
+    <p style="margin-bottom: 10px;">選択した日付: <span id="selected-date"></span></p>
+    <form id="reservation-form-element" action="/karaokeBooking" method="post">
+      
+      <input type="hidden" id="student_id" name="student_id" th:value="${studentId}" required style="width: 100%; padding: 8px; margin-bottom: 10px;">
+      <input type="hidden" id="selected_date_input" name="selected_date">
+
+      <div id="form-fields" style="display: none;">
+        <label for="user_number">人数：</label><br>
+        <input type="number" id="user_number" name="user_number" required style="width: 100%; padding: 8px; margin-bottom: 10px;"><br>
+        <input type="submit" value="予約する" style="width: 100%; padding: 10px;">
+      </div>
+    </form>
+  </div>
+
+  <script th:inline="javascript">
+    let currentYear = new Date().getFullYear();
+    let currentMonth = new Date().getMonth();
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // 正確な比較のため
+
+    const fullDates = /*[[${fullDates}]]*/ [];
+
+    document.getElementById("prev-month").addEventListener("click", () => {
+      const isCurrentMonth = currentYear === today.getFullYear() && currentMonth === today.getMonth();
+      if (isCurrentMonth) return;
+
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      generateCalendar(currentYear, currentMonth);
+    });
+
+    document.getElementById("next-month").addEventListener("click", () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      generateCalendar(currentYear, currentMonth);
+    });
+
+    function generateCalendar(year, month) {
+      const monthYearText = `${year}年${month + 1}月`;
+      document.getElementById("month-year").textContent = monthYearText;
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const lastDate = new Date(year, month + 1, 0).getDate();
+      const tbody = document.getElementById("calendar-body");
+      tbody.innerHTML = "";
+
+      let date = 1;
+      for (let i = 0; i < 6; i++) {
+        const row = document.createElement("tr");
+        for (let j = 0; j < 7; j++) {
+          const cell = document.createElement("td");
+          cell.style.border = "1px solid #ccc";
+          cell.style.padding = "10px";
+          cell.style.textAlign = "center";
+
+          if (i === 0 && j < firstDay) {
+            cell.textContent = "";
+          } else if (date > lastDate) {
+            break;
+          } else {
+            const paddedMonth = String(month + 1).padStart(2, '0');
+            const paddedDate = String(date).padStart(2, '0');
+            const isoDate = `${year}-${paddedMonth}-${paddedDate}`;
+            const currentDate = new Date(year, month, date);
+            currentDate.setHours(0, 0, 0, 0);
+
+            cell.textContent = date;
+
+            if (currentDate < today) {
+              cell.classList.add("past-date");
+            } else if (fullDates.includes(isoDate)) {
+              cell.classList.add("full-date");
+            } else {
+              cell.classList.add("date-cell");
+              cell.style.cursor = "pointer";
+
+              ((d) => {
+                cell.addEventListener("click", () => openReservationForm(year, month, d));
+              })(date);
+            }
+
+            date++;
+          }
+          row.appendChild(cell);
+        }
+        tbody.appendChild(row);
+        if (date > lastDate) break;
+      }
+    }
+
+    function openReservationForm(year, month, date) {
+      const form = document.getElementById("reservation-form");
+
+      const displayDate = `${year}年${month + 1}月${date}日`;
+      document.getElementById("selected-date").textContent = displayDate;
+
+      const paddedMonth = String(month + 1).padStart(2, '0');
+      const paddedDate = String(date).padStart(2, '0');
+      const isoDate = `${year}-${paddedMonth}-${paddedDate}`;
+      document.getElementById("selected_date_input").value = isoDate;
+
+      form.style.display = "block";
+      document.getElementById("form-fields").style.display = "block"; // ← ここで表示する
+
+      window.scrollTo({ top: form.offsetTop, behavior: 'smooth' });
+    }
+
+    // 利用人数制限バリデーション（最大20人）
+    document.getElementById("reservation-form-element").addEventListener("submit", function(event) {
+      const userNumber = parseInt(document.getElementById("user_number").value, 10);
+      if (userNumber > 20) {
+        alert("最大利用人数は20人です");
+        event.preventDefault();
+      } else if (userNumber <= 0) {
+        alert("利用人数は1人以上で入力してください");
+        event.preventDefault();
+      }
+    });
+
+    generateCalendar(currentYear, currentMonth);
+  </script>
+</body>
+</html>

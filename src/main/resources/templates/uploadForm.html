@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSVアップロード</title>
+</head>
+<body>
+
+    <h1>CSVファイルアップロード</h1>
+
+    <form action="/closedcreate" method="post" enctype="multipart/form-data">
+        <input type="file" name="csvFile" accept=".csv" required />
+        <button type="submit">登録</button>
+    </form>
+
+</body>
+</html>

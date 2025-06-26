@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ブース予約ページ</title>
+	<style>
+		body {
+			font-family: sans-serif;
+			padding: 20px;
+			background-color: #fefefe;
+		}
+
+		.container {
+			max-width: 600px;
+			margin: 0 auto;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+		}
+
+		th,
+		td {
+			border: 1px solid #ccc;
+			padding: 12px;
+			text-align: center;
+		}
+
+		th {
+			background-color: #f2f2f2;
+		}
+
+		.time-label {
+			font-weight: bold;
+			background-color: #f9f9f9;
+		}
+
+		#table-wrapper {
+			height: auto;
+			width: 350px;
+			overflow-x: auto;
+			overflow-y: auto;
+			border-radius: 8px;
+			/* 角を丸くしたいとき */
+		}
+
+		#table-position {
+			display: flex;
+			justify-content: center;
+		}
+
+		table {
+			border-collapse: collapse;
+			border-spacing: 0;
+			width: max-content;
+			margin-bottom: 20px;
+			/* 内容に合わせて幅を広げる */
+		}
+
+		td,
+		th {
+			white-space: nowrap;
+			padding: 8px;
+			border: 2px solid #000;
+			box-sizing: border-box;
+		}
+
+		/*縦固定*/
+		thead th {
+			position: sticky;
+			top: 0;
+			background: #d3d3d3;
+			/* 背景色ないとスクロール時に下が透ける */
+			z-index: 1;
+		}
+
+		/* 左固定 */
+		.sticky-left {
+			position: sticky;
+			left: 0;
+			z-index: 3;
+			/* 上のヘッダーより手前にするため少し高めに */
+		}
+
+		.sticky-corner {
+			position: sticky;
+			top: 0;
+			left: 0;
+			background-color: #d3d3d3;
+			z-index: 4;
+			/* いちばん前に出す */
+		}
+
+		.selected-cell {
+			background-color: #cceeff !important;
+			border: 2px solid #3399ff !important;
+		}
+
+		.cell-available {
+			color: green;
+			background-color: white;
+		}
+
+		.cell-unavailable {
+			color: red;
+			background-color: #ffe5e5;
+		}
+
+		.selected-cell {
+			background-color: #d0f0ff !important;
+			/* 選択中（青っぽく） */
+		}
+	</style>
+
+</head>
+
+<body>
+
+	<h2 style="text-align: center;">予約タイムテーブル</h2>
+
+	<div style="display: flex; justify-content: space-between; align-items: center;">
+		<div>
+			<h4>選択された日付</h4>
+			<h4 id="selectText"></h4>
+		</div>
+		<div>
+			<h4>
+				<span style="color: green;">〇</span>
+				：予約可能
+			</h4>
+			<h4>
+				<span style="color:red;">×</span>
+				：予約不可能
+			</h4>
+		</div>
+	</div>
+
+	</br>
+
+	<div id="table-position">
+		<div id="table-wrapper">
+			<table>
+				<thead>
+					<tr id="time-table-head"></tr>
+				</thead>
+				<tbody id="time-table-body"></tbody>
+			</table>
+		</div>
+	</div>
+
+	<form th:action="@{/reservationConpleted}" method="post" id="bookingForm">
+
+		<input type="hidden" id="reservationData" name="reservationData">
+
+		<input id="bookingButton" onclick="" type="submit" value="予約する"
+			style="margin-top: 20px; width: 100%; padding: 10px; display: none;">
+
+	</form>
+
+	<script src="/js/boothTimeTable.js"></script>
+
+</body>
+
+</html>

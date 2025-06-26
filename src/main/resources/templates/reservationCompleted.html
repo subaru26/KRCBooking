@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>予約完了</title>
+  <style>
+    .center-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      font-size: 20px;
+    }
+    .reservation-details {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="center-box">
+    <div>ご予約完了しました！！</div>
+    <div th:text="${showDetail}"></div>
+    <div class="reservation-details" id="reservationDisplay"></div>
+  </div>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const saved = localStorage.getItem("selectedReservations");
+      if (saved) {
+        const data = JSON.parse(saved);
+        const container = document.getElementById("reservationDisplay");
+
+        if (data.length === 0) {
+          container.textContent = "予約データが見つかりませんでした。";
+        } else {
+          data.sort((a, b) => a.time.localeCompare(b.time)); // 時間でソート
+          const startTime = data[0].time;
+          const lastTime = data[data.length - 1].time;
+
+          // 終了時間は +15分で表示
+          const addMinutesToTime = (timeStr, minutesToAdd) => {
+            const [h, m] = timeStr.split(":").map(Number);
+            let newMin = m + minutesToAdd;
+            let newHour = h + Math.floor(newMin / 60);
+            newMin = newMin % 60;
+            return newHour.toString().padStart(2, '0') + ':' + newMin.toString().padStart(2, '0');
+          };
+
+          const endTime = addMinutesToTime(lastTime, 15);
+          const boothNum = data[0].booth;
+
+          const summary = document.createElement("p");
+          summary.textContent = `時間：${startTime} ～ ${endTime}`;
+          container.appendChild(summary);
+
+          // 予約詳細を個別に表示したい場合はこちら
+          /*
+          data.forEach(item => {
+            const p = document.createElement("p");
+            p.textContent = `時間：${item.time} ／ ブース：${item.booth}`;
+            container.appendChild(p);
+          });
+          */
+
+          // 保存された選択データは消しておく
+          localStorage.removeItem("selectedReservations");
+        }
+      } else {
+        document.getElementById("reservationDisplay").textContent = "予約情報が見つかりませんでした。";
+      }
+    });
+  </script>
+</body>
+
+</html>

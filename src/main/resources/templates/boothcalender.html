@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>予約カレンダー</title>
+</head>
+
+<body style="font-family: sans-serif; padding: 10px;">
+
+	<h1 style="text-align: center;">予約カレンダー</h1>
+
+	<div style="text-align: center; margin-bottom: 10px;">
+		<button id="prev-month">＜</button>
+		<span id="month-year"></span>
+		<button id="next-month">＞</button>
+	</div>
+
+	<div id="calendar-container" style="overflow-x: auto;">
+		<table id="calendar" style="width: 100%; border-collapse: collapse;">
+			<thead>
+				<tr>
+					<th>日</th>
+					<th>月</th>
+					<th>火</th>
+					<th>水</th>
+					<th>木</th>
+					<th>金</th>
+					<th>土</th>
+				</tr>
+			</thead>
+			<tbody id="calendar-body"></tbody>
+		</table>
+	</div>
+
+	<!-- ★ここでstudentIdをlocalStorageに保存 -->
+	<script th:inline="javascript">
+		const studentId = /*[[${studentId}]]*/ "default";
+		localStorage.setItem("studentId", studentId);
+		
+	</script>
+
+	<!-- カレンダー表示用の外部JS（studentIdはlocalStorageから取得） -->
+	<script src="/js/boothCalender.js"></script>
+</body>
+</html>

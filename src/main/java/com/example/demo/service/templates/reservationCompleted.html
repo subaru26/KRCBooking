@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>予約完了</title>
+  <style>
+    .center-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh; /* 画面の縦全体を使って中央に */
+      text-align: center;
+      font-size: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="center-box">
+    <div th:text="${showDetail}"></div>
+    <div>ご予約完了しました！！</div>
+  </div>
+</body>
+
+</html>

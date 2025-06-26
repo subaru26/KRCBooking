@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>予約履歴</title>
+    <link rel="stylesheet" href="/css/style.css"> <!-- 外部CSS -->
+</head>
+<body>
+    <!-- エラーメッセージ表示 -->
+    <h2 th:if="${errorMessage}" th:text="${errorMessage}"></h2>
+
+    <!-- 通常メッセージ（キャンセル完了以外） -->
+    <h2 th:if="${message} and ${message != '予約をキャンセルしました。'}"
+        th:text="${message}"></h2>
+
+    <!-- ユーザー名表示 -->
+    <h2 th:if="${userName}" th:text="${userName + 'さんの予約'}"></h2>
+
+    <!-- 予約履歴一覧 -->
+    <div th:if="${bookings}">
+        <div th:each="booking : ${bookings}" th:classappend="${booking.canceled} ? 'canceled-block'">
+    <p>
+        予約ID：<span th:text="${booking.booking_id}"></span>
+        <span th:if="${booking.canceled}" style="color: red; font-weight: bold; margin-left: 10px;">
+            （キャンセル済み）
+        </span>
+    </p>
+    <p>予約日：<span th:text="${#dates.format(booking.date, 'yyyy年MM月dd日')}"></span></p>
+    <p>場所：<span th:text="${booking.facilities_type}"></span></p>
+    <p th:if="${booking.users_number != null}">人数：<span th:text="${booking.users_number}"></span>人</p>
+
+    <!-- キャンセルボタン（未キャンセルの予約にだけ表示） -->
+    <form method="post" action="/cancel" class="cancel-form" th:if="${!booking.canceled}">
+        <input type="hidden" name="bookingId" th:value="${booking.booking_id}" />
+        <input type="hidden" name="lineId" th:value="${lineId}" />
+        <button type="button" onclick="confirmCancel(this)">キャンセル</button>
+    </form>
+
+    <hr>
+</div>
+    </div>
+
+    <!-- キャンセル確認モーダル -->
+    <div class="modal-overlay" id="cancelModal" style="display: none;">
+        <div class="modal-content">
+            <p>キャンセルしてもいいかなあ</p>
+            <div class="modal-buttons">
+                <button onclick="submitCancel()">はい</button>
+                <button onclick="closeModal()">いいえ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- キャンセル完了モーダル -->
+    <div class="modal-overlay" id="messageModal"
+         th:if="${message == '予約をキャンセルしました。'}"
+         style="display: flex;">
+        <div class="modal-content">
+            <p th:text="${message}"></p>
+            <div class="modal-buttons">
+                <a th:href="@{'/reservationhistory'(lineId=${lineId})}"
+                   style="padding: 8px 16px; background-color: #ccc; border-radius: 5px; text-decoration: none;">
+                    閉じる
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/cancelCheck.js"></script>
+</body>
+</html>

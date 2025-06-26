@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ブース予約ページ</title>
+	<style>
+		body {
+			font-family: sans-serif;
+			padding: 20px;
+			background-color: #FEFEFE;
+		}
+
+		.container {
+			max-width: 600px;
+			margin: 0 auto;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+		}
+
+		th,
+		td {
+			border: 1px solid #ccc;
+			padding: 12px;
+			text-align: center;
+		}
+
+		th {
+			background-color: #F2F2F2;
+		}
+
+		.time-label {
+			font-weight: bold;
+			background-color: #F9F9F9;
+		}
+
+		#table-wrapper {
+			height: auto;
+			width: 350px;
+			overflow-x: auto;
+			overflow-y: auto;
+			border-radius: 8px;
+			/* 角を丸くしたいとき */
+		}
+
+		#table-position {
+			display: flex;
+			justify-content: center;
+		}
+
+		table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	background-color: #ffffff;
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+thead th {
+	position: sticky;
+	top: 0;
+	background: #e6e6e6;
+	z-index: 1;
+	color: #333;
+	font-weight: bold;
+	padding: 10px;
+	font-size: 14px;
+}
+
+th, td {
+	border: 1px solid #ddd;
+	padding: 10px;
+	text-align: center;
+	font-size: 14px;
+}
+
+.time-label {
+	background-color: #f9f9f9;
+	font-weight: bold;
+}
+
+/* 時間ラベル列（左端のセル）を固定 */
+.sticky-left {
+	position: sticky;
+	left: 0;
+	z-index: 2;
+	background-color: #f0f0f0;
+}
+
+/* 左上のセル（時間タイトルなど）をさらに強調して一番上に固定） */
+.sticky-corner {
+	position: sticky;
+	left: 0;
+	top: 0;
+	z-index: 3;
+	background-color: #dcdcdc;
+}
+
+		
+
+		.selected-cell {
+			background-color: #CCEEFF !important;
+			border: 2px solid #3399FF !important;
+		}
+
+		.cell-available {
+			color: green;
+			background-color: white;
+		}
+
+		.cell-unavailable {
+			color: red;
+			background-color: #FFE5E5;
+		}
+
+		.selected-cell {
+			background-color: #D0F0FF !important;
+			/* 選択中（青っぽく） */
+		}
+
+		/* モーダル背景 */
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 9999;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.5);
+		}
+
+		/* モーダル内容 */
+		.modal-content {
+			background-color: #fff;
+			margin: 10% auto;
+			padding: 20px;
+			width: 300px;
+			border-radius: 8px;
+			text-align: center;
+			position: relative;
+		}
+
+		/* 閉じるボタン */
+		.modal .close {
+			position: absolute;
+			right: 10px;
+			top: 10px;
+			font-size: 24px;
+			cursor: pointer;
+		}
+
+		.folder-tabs {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 20px;
+	gap: 4px;
+}
+
+.folder-tab {
+	padding: 10px 16px;
+	background-color: #f0f0f0;
+	border: 1px solid #aaa;
+	border-radius: 12px 12px 0 0;
+	cursor: pointer;
+	font-size: 15px;
+	font-weight: 500;
+	color: #333;
+	transition: background-color 0.3s ease, transform 0.2s ease;
+	box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+}
+
+.folder-tab:hover {
+	background-color: #e0e0e0;
+	transform: translateY(-2px);
+}
+
+.folder-tab.active {
+	background-color: #ffffff;
+	border: 1px solid #aaa;
+	border-bottom: none;
+	color: #000;
+	z-index: 2;
+	transform: translateY(0);
+	box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+}
+@media screen and (max-width: 600px) {
+.sticky-left,.time-label {
+		width: 70px;
+		min-width: 70px;
+		max-width: 70px;
+		font-size: 12px; /* ← 文字サイズも調整可能 */
+}
+}
+
+	</style>
+</head>
+
+<body>
+	<h2 style="text-align: center;">予約タイムテーブル</h2>
+	<div style="display: flex; justify-content: space-between; align-items: center;">
+		<div>
+			<h4>選択された日付</h4>
+			<h4 id="selectText"></h4>
+		</div>
+		<div>
+			<h4>
+				<span style="color: green;">〇</span>
+				：予約可能
+			</h4>
+			<h4>
+				<span style="color:red;">×</span>
+				：予約不可能
+			</h4>
+		</div>
+	</div>
+	</br>
+
+	<div class="folder-tabs">
+		<div class="folder-tab active" onclick="showTab(0)">1号館</div>
+		<div class="folder-tab" onclick="showTab(1)">2号館</div>
+		<div class="folder-tab" onclick="showTab(2)">3号館</div>
+		<div class="folder-tab" onclick="showTab(3)">4号館</div>
+		<div class="folder-tab" onclick="showTab(4)">5号館</div>
+		<div class="folder-tab" onclick="showTab(5)">6号館</div>
+
+	</div>
+
+	<div id="table-position">
+		<div id="table-wrapper">
+			<table>
+				<thead>
+					<tr id="time-table-head"></tr>
+				</thead>
+				<tbody id="time-table-body"></tbody>
+			</table>
+		</div>
+	</div>
+	<!-- モーダル -->
+	<div id="selectTimeModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h3>選択された時間</h3>
+			<h3 id="selectTime"></h3>
+			<h3 id="checkTextId"></h3>
+			<div style="display: flex; justify-content: center; gap: 10px;">
+				<button id="cancelBooking">キャンセル</button>
+				<form th:action="@{/reservationConpleted}" method="post" id="bookingForm">
+					<input type="hidden" id="reservationData" name="reservationData">
+					<button id="bookingButton" type="submit" style="text-align: center;">予約する</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- モーダルを開くボタン -->
+	<button id="showSelectedBtn" style="margin-top: 20px; width: 100%; padding: 10px;">次へ進む</button>
+	<!-- 現在選択されているブースとは違うブースを選択された場合のモーダル -->
+	<div id="columnAlertModal"
+		style="display: none; position: fixed; top: 30%; left: 10%; right: 10%; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px gray; z-index: 1000;">
+		<h4 id="modalMessage">他のブースが選択されています。切り替えますか？</h4>
+		<div style="display: flex; justify-content: center; gap: 10px;">
+			<button id="cancelChange">キャンセル</button>
+			<button id="confirmChange">切り替える</button>
+		</div>
+	</div>
+	<!-- 時間を飛ばして選択された場合のモーダル -->
+	<div id="timeSkippedModal"
+		style="display: none; position: fixed; top: 30%; left: 10%; right: 10%; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px gray; z-index: 1000;">
+		<h4>飛び飛びの時間は選択できません。切り替えますか？</h4>
+		<div style="display: flex; justify-content: center; gap: 10px;">
+			<button id="cancelSkipped">キャンセル</button>
+			<button id="skippedChange">切り替える</button>
+		</div>
+	</div>
+	<script src="/js/boothTimeTable.js"></script>
+</body>
+
+</html>
