@@ -104,7 +104,7 @@ public class KRCBookingController {
         headers.set("Content-Type", "application/json");
         headers.set("Authorization", "Bearer " + channelToken);
 
-        String urlWithParam = "https://newly-uncommon-quetzal.ngrok-free.app/createForm?lineId=" + userId;
+        String urlWithParam = "https://krcbooking.onrender.com/createForm?lineId=" + userId;
 
         String body = String.format("""
                 {
@@ -138,7 +138,7 @@ public class KRCBookingController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
         headers.set("Authorization", "Bearer " + channelToken);
-        String urlWithParam = "https://newly-uncommon-quetzal.ngrok-free.app/karaokeBooking?lineId=" + userId;
+        String urlWithParam = "https://krcbooking.onrender.com/karaokeBooking?lineId=" + userId;
 
         String body = String.format("""
                 {
@@ -173,7 +173,7 @@ public class KRCBookingController {
         headers.set("Content-Type", "application/json");
         headers.set("Authorization", "Bearer " + channelToken);
         
-        String urlWithParam = "https://newly-uncommon-quetzal.ngrok-free.app/calender?lineId=" + userId;
+        String urlWithParam = "https://krcbooking.onrender.com/calender?lineId=" + userId;
 
         String body = String.format("""
                 {
@@ -208,7 +208,7 @@ public class KRCBookingController {
         headers.set("Content-Type", "application/json");
         headers.set("Authorization", "Bearer " + channelToken);
 
-        String urlWithParam = "https://newly-uncommon-quetzal.ngrok-free.app/reservationhistory?lineId=" + userId;
+        String urlWithParam = "https://krcbooking.onrender.com/reservationhistory?lineId=" + userId;
 
         String body = String.format("""
                 {
