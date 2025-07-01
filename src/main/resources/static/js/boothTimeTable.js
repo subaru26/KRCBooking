@@ -3,7 +3,7 @@ let boothList = [];
 (async () => {
 	try {
 		// ブース数取得
-		const response = await fetch('https://newly-uncommon-quetzal.ngrok-free.app/api/booth/boothCount', {
+		const response = await fetch('https://krcbooking.onrender.com/api/booth/boothCount', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -34,7 +34,7 @@ async function loadReservationTable(selectFacility) {
 	try {
 		const selectDate = localStorage.getItem("selectedDate");
 		// 予約状況取得
-		const response = await fetch('https://newly-uncommon-quetzal.ngrok-free.app/api/booth/reservationTime', {
+		const response = await fetch('https://krcbooking.onrender.com/api/booth/reservationTime', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
