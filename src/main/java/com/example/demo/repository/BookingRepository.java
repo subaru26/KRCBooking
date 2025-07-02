@@ -16,42 +16,37 @@ public class BookingRepository {
     public BookingRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
-public int boothBookingRegistration(String studentId, String selectDate) {
-		
-		String sql = "INSERT INTO booking (student_id, facilities_type, date) VALUES(:studentId, :facilitiesType, :date)";
-		
-		MapSqlParameterSource param = new MapSqlParameterSource()
-				.addValue("studentId", studentId)
-				.addValue("facilitiesType", "booth")
-				.addValue("date", selectDate);
-		
-		namedParameterJdbcTemplate.update(sql, param);
-		
-		return namedParameterJdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", new MapSqlParameterSource(), Integer.class);
-	}
 
+    // booth 予約登録 + ID取得（PostgreSQL対応済）
+    public int boothBookingRegistration(String studentId, String selectDate) {
+        String sql = """
+            INSERT INTO booking (student_id, facilities_type, date)
+            VALUES (:studentId, :facilitiesType, :date)
+            RETURNING booking_id
+        """;
 
-//    // 選択された日付の予約idのリストを返す
-//    public List<Integer> boothBookingNumber(String reservationTime) {
-//        String sql = "SELECT booking_id FROM booking WHERE date = :date";
-//
-//        MapSqlParameterSource params = new MapSqlParameterSource()
-//                .addValue("date", reservationTime);
-//
-//        return namedParameterJdbcTemplate.queryForList(sql, params, Integer.class);
-//    }
+        MapSqlParameterSource param = new MapSqlParameterSource()
+                .addValue("studentId", studentId)
+                .addValue("facilitiesType", "booth")
+                .addValue("date", selectDate);
 
-    // booking テーブルに新規レコード挿入
+        return namedParameterJdbcTemplate.queryForObject(sql, param, Integer.class);
+    }
+
+    // booking テーブルに新規レコード挿入 + ID取得（PostgreSQL対応済）
     public Integer insertBooking(String studentId, String facilitiesType, LocalDate date) {
-        String sql = "INSERT INTO booking (student_id, facilities_type, date) VALUES (:student_id, :facilities_type, :date)";
+        String sql = """
+            INSERT INTO booking (student_id, facilities_type, date)
+            VALUES (:student_id, :facilities_type, :date)
+            RETURNING booking_id
+        """;
+
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("student_id", studentId)
                 .addValue("facilities_type", facilitiesType)
                 .addValue("date", date);
 
-        namedParameterJdbcTemplate.update(sql, params);
-
-        return namedParameterJdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", new MapSqlParameterSource(), Integer.class);
+        return namedParameterJdbcTemplate.queryForObject(sql, params, Integer.class);
     }
 
     // karaoke テーブルに新規レコード挿入
@@ -76,29 +71,6 @@ public int boothBookingRegistration(String studentId, String selectDate) {
 
         return namedParameterJdbcTemplate.queryForList(sql, new MapSqlParameterSource(), LocalDate.class);
     }
-
-//    // LINEのユーザーIDから予約情報を取得（karaoke込み）
-//    public List<Map<String, Object>> findBookingsByLineId(String lineId) {
-//        String sql = """
-//            SELECT 
-//                b.booking_id, 
-//                b.date, 
-//                b.facilities_type, 
-//                k.users_number, 
-//                k.is_check,
-//                b.canceled
-//            FROM users u
-//            JOIN booking b ON u.student_id = b.student_id
-//            LEFT JOIN karaoke k ON b.booking_id = k.booking_id
-//            WHERE u.line_id = :line_id
-//            ORDER BY b.date DESC
-//        """;
-//
-//        MapSqlParameterSource params = new MapSqlParameterSource()
-//                .addValue("line_id", lineId);
-//
-//        return namedParameterJdbcTemplate.queryForList(sql, params);
-//    }
 
     // student_id から予約情報をユーザー名・人数込みで取得
     public List<Map<String, Object>> findDetailedBookingsByStudentId(String studentId) {
@@ -129,24 +101,7 @@ public int boothBookingRegistration(String studentId, String selectDate) {
         return namedParameterJdbcTemplate.queryForList(sql, params);
     }
 
-//    // --- 新規追加: キャンセル（論理削除） ---
-//    public int cancelBookingById(Integer bookingId) {
-//        String sql = "UPDATE booking SET is_canceled = true WHERE booking_id = :booking_id";
-//        MapSqlParameterSource params = new MapSqlParameterSource()
-//                .addValue("booking_id", bookingId);
-//
-//        return namedParameterJdbcTemplate.update(sql, params);
-//    }
-
-//    // --- 物理削除する場合はこちら ---
-//    public int deleteBookingById(Integer bookingId) {
-//        String sql = "DELETE FROM booking WHERE booking_id = :booking_id";
-//        MapSqlParameterSource params = new MapSqlParameterSource()
-//                .addValue("booking_id", bookingId);
-//
-//        return namedParameterJdbcTemplate.update(sql, params);
-//    }
- // 当日の有効な予約を取得（キャンセルされていない）
+    // 当日の有効な予約を取得（キャンセルされていない）
     public List<Map<String, Object>> findActiveBookingsByDate(LocalDate date) {
         String sql = """
             SELECT u.line_id, u.user_name, b.facilities_type,
@@ -155,7 +110,8 @@ public int boothBookingRegistration(String studentId, String selectDate) {
             JOIN users u ON b.student_id = u.student_id
             LEFT JOIN booth bo ON b.booking_id = bo.booking_id
             LEFT JOIN booth_detail bd ON bo.booth_number = bd.booth_number
-            WHERE b.date = :date AND b.canceled = 0
+            WHERE b.date = :date
+              AND (b.canceled IS NULL OR b.canceled = false)
         """;
 
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -163,6 +119,4 @@ public int boothBookingRegistration(String studentId, String selectDate) {
 
         return namedParameterJdbcTemplate.queryForList(sql, params);
     }
-
-    
 }
