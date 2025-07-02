@@ -17,23 +17,27 @@ public class BookingRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    // booth 予約登録 + ID取得（PostgreSQL対応済）
+    // booth 予約登録 + ID取得（PostgreSQL対応）
     public int boothBookingRegistration(String studentId, String selectDate) {
         String sql = """
             INSERT INTO booking (student_id, facilities_type, date)
             VALUES (:studentId, :facilitiesType, :date)
             RETURNING booking_id
         """;
+        
+        // 日付を LocalDate に変換
+        LocalDate date = LocalDate.parse(selectDate);
+        
 
         MapSqlParameterSource param = new MapSqlParameterSource()
                 .addValue("studentId", studentId)
                 .addValue("facilitiesType", "booth")
-                .addValue("date", selectDate);
+                .addValue("date", date);
 
         return namedParameterJdbcTemplate.queryForObject(sql, param, Integer.class);
     }
 
-    // booking テーブルに新規レコード挿入 + ID取得（PostgreSQL対応済）
+    // booking テーブルに新規レコード挿入 + ID取得
     public Integer insertBooking(String studentId, String facilitiesType, LocalDate date) {
         String sql = """
             INSERT INTO booking (student_id, facilities_type, date)
@@ -51,7 +55,11 @@ public class BookingRepository {
 
     // karaoke テーブルに新規レコード挿入
     public void insertKaraoke(Integer bookingId, Integer usersNumber) {
-        String sql = "INSERT INTO karaoke (booking_id, users_number, is_check) VALUES (:booking_id, :users_number, false)";
+        String sql = """
+            INSERT INTO karaoke (booking_id, users_number, is_check)
+            VALUES (:booking_id, :users_number, false)
+        """;
+
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("booking_id", bookingId)
                 .addValue("users_number", usersNumber)
