@@ -1,6 +1,7 @@
 package com.example.demo.repository;
 
 import java.sql.Time;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,9 +50,11 @@ public class BoothRepository {
 
 		String sql = "select start_time, end_time from booking inner join booth "
 				+ "on booking.booking_id = booth.booking_id where date = :date and booth_number = :boothNumber";
+		
+		LocalDate dateLocal = LocalDate.parse(date);
 
 		MapSqlParameterSource params = new MapSqlParameterSource()
-				.addValue("date", date)
+				.addValue("date", dateLocal)
 				.addValue("boothNumber", booth_number);
 
 		List<Map<String, Object>> rows = namedParameterJdbcTemplate.queryForList(sql, params);
