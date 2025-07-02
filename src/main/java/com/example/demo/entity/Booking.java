@@ -27,7 +27,7 @@ public class Booking {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    @Column(name = "canceled", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "canceled", nullable = false)
     private Boolean canceled = false;
 
     // --- Getter and Setter ---
