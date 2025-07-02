@@ -46,7 +46,7 @@ public class KaraokeBookingController {
                 .collect(Collectors.toList());
 
         model.addAttribute("fullDates", fullDateStrings);
-        return "karaokeBooking";
+        return "karaokebooking";
     }
 
     /**
@@ -76,7 +76,7 @@ public class KaraokeBookingController {
                     .collect(Collectors.toList());
             model.addAttribute("fullDates", fullDateStrings);
 
-            return "karaokeBooking";
+            return "karaokebooking";
         }
 
         // 日付の入力チェックと変換
@@ -86,14 +86,14 @@ public class KaraokeBookingController {
                 model.addAttribute("errorMessage", "日付が入力されていません");
                 model.addAttribute("user_number", userNumber);
                 model.addAttribute("selected_date", selectedDate);
-                return "karaokeBooking";
+                return "karaokebooking";
             }
             date = LocalDate.parse(selectedDate);
         } catch (DateTimeParseException e) {
             model.addAttribute("errorMessage", "日付の形式が不正です");
             model.addAttribute("user_number", userNumber);
             model.addAttribute("selected_date", selectedDate);
-            return "karaokeBooking";
+            return "karaokebooking";
         }
 
         // 登録処理
