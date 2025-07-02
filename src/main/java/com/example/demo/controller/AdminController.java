@@ -10,47 +10,48 @@ import com.example.demo.repository.BoothDetailRepository;
 @Controller
 public class AdminController {
 
-	@Autowired
-	BoothDetailRepository boothDetailRepository;
+    @Autowired
+    BoothDetailRepository boothDetailRepository;
 
-	//管理者ログイン関係////////////////////////////////////////////
-	@GetMapping("/login")
-	public String loginPage() {
-		return "login";
-	}
+    // 管理者ログインページ
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
+    }
 
-	@PostMapping("/adminHome")
-	public String loginAdminHome(String user_id, String password) {
+    // ログイン処理
+    @PostMapping("/adminHome")
+    public String loginAdminHome(String user_id, String password) {
+        if ("admin".equals(user_id) && "kokuri1920".equals(password)) {
+            return "adminhome";
+        } else {
+            return "login";
+        }
+    }
 
-		if (user_id.equals("admin") && password.equals("kokuri1920")) {
-			return "adminhome";
-		} else {
-			return "login";
-		}
-	}
+    // ブース登録画面へ
+    @PostMapping("/boothmanage")
+    public String boothManagePage() {
+        return "boothmanage";
+    }
 
-	//////ブース登録//////////////
+    // ブース登録実行
+    @PostMapping("/boothsubmit")
+    public String boothInsert(String building, String floor, String number) {
+        String boothPlace = building + "_" + floor + "_" + number;
 
-	@PostMapping("/boothmanage")
-	public String boothManagePage() {
-		return "boothmanage";
-	}
+        // booth_numberを連番で生成（例: floorとnumberを連結したint）
+        int boothNumber = Integer.parseInt(floor + number);
 
-	@PostMapping("/boothsubmit")
-	public String boothInsert(String building, String floor, String number) {
+        // 重複時スキップで登録
+        boothDetailRepository.insertBoothPlace(boothNumber, boothPlace);
 
-		String boothPlace = building + "_" + floor + "_" + number;
+        return "boothOk";
+    }
 
-		boothDetailRepository.insertBoothPlace(boothPlace);
-
-		return "boothOk";
-	}
-	/////////////////////////////
-
-
-	@PostMapping("/backAdminHome")
-	public String adminHome() {
-		return "adminhome";
-	}
-
+    // 管理画面に戻る
+    @PostMapping("/backAdminHome")
+    public String adminHome() {
+        return "adminhome";
+    }
 }
