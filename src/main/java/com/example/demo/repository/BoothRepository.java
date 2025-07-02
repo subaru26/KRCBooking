@@ -16,78 +16,80 @@ import com.example.demo.model.BoothResponse;
 @Repository
 public class BoothRepository {
 
-	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-	public BoothRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-	}
+    public BoothRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+    }
 
-	//予約可能開始時間返す
-	public List<BoothResponse> reservationPossibleTime(String reservationTime, int boothNumber) {
+    // 予約可能開始時間返す
+    public List<BoothResponse> reservationPossibleTime(String reservationTime, int boothNumber) {
 
-		String sql = "SELECT booth.start_time, booth.end_time, booth.booth_number FROM booking "
-				+ "INNER JOIN booth ON booking.booking_id = booth.booking_id "
-				+ "where booking.date = :reservationTime and booth.booth_number = :boothNumber and booking.canceled = 0 order by start_time;";
+        LocalDate localDate = LocalDate.parse(reservationTime);
 
-		MapSqlParameterSource param = new MapSqlParameterSource()
-				.addValue("reservationTime", reservationTime)
-				.addValue("boothNumber", boothNumber);
+        String sql = "SELECT booth.start_time, booth.end_time, booth.booth_number FROM booking "
+                + "INNER JOIN booth ON booking.booking_id = booth.booking_id "
+                + "WHERE booking.date = :reservationTime AND booth.booth_number = :boothNumber "
+                + "AND (booking.canceled IS NULL OR booking.canceled = false) ORDER BY start_time";
 
-		return namedParameterJdbcTemplate.query(
-				sql,
-				param,
-				(rs, rowNum) -> {
-					BoothResponse boothResponse = new BoothResponse();
-					boothResponse.setStartTime(rs.getTime("start_time").toLocalTime());
-					boothResponse.setEndTime(rs.getTime("end_time").toLocalTime());
-					boothResponse.setBoothNumber(rs.getInt("booth_number"));
-					return boothResponse;
-				});
-	}
+        MapSqlParameterSource param = new MapSqlParameterSource()
+                .addValue("reservationTime", localDate)
+                .addValue("boothNumber", boothNumber);
 
-	//ブース予約直前時間取得
-	public List<List<String>> boothBookingTime(int booth_number, String date) {
+        return namedParameterJdbcTemplate.query(
+                sql,
+                param,
+                (rs, rowNum) -> {
+                    BoothResponse boothResponse = new BoothResponse();
+                    boothResponse.setStartTime(rs.getTime("start_time").toLocalTime());
+                    boothResponse.setEndTime(rs.getTime("end_time").toLocalTime());
+                    boothResponse.setBoothNumber(rs.getInt("booth_number"));
+                    return boothResponse;
+                });
+    }
 
-		String sql = "select start_time, end_time from booking inner join booth "
-				+ "on booking.booking_id = booth.booking_id where date = :date and booth_number = :boothNumber";
-		
-		LocalDate dateLocal = LocalDate.parse(date);
+    // ブース予約直前時間取得
+    public List<List<String>> boothBookingTime(int booth_number, String date) {
 
-		MapSqlParameterSource params = new MapSqlParameterSource()
-				.addValue("date", dateLocal)
-				.addValue("boothNumber", booth_number);
+        String sql = "SELECT start_time, end_time FROM booking INNER JOIN booth "
+                + "ON booking.booking_id = booth.booking_id WHERE date = :date AND booth_number = :boothNumber";
 
-		List<Map<String, Object>> rows = namedParameterJdbcTemplate.queryForList(sql, params);
+        LocalDate dateLocal = LocalDate.parse(date);
 
-		List<List<String>> result = new ArrayList<>();
-		for (Map<String, Object> row : rows) {
-			List<String> timePair = new ArrayList<>();
-			timePair.add(String.valueOf(row.get("start_time")));
-			timePair.add(String.valueOf(row.get("end_time")));
-			result.add(timePair);
-		}
-		
-		return result;
-	}
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("date", dateLocal)
+                .addValue("boothNumber", booth_number);
 
-	//ブース予約登録
-	public void boothBoothRegistration(int bookingId, int boothNumber, LocalTime startTime, LocalTime endTime) {
+        List<Map<String, Object>> rows = namedParameterJdbcTemplate.queryForList(sql, params);
 
-		String sql = "INSERT INTO booth (booking_id, booth_number, start_time, end_time,is_check) VALUES(:bookingId, :boothNumber, :startTime, :endTime, :is_check)";
+        List<List<String>> result = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            List<String> timePair = new ArrayList<>();
+            timePair.add(String.valueOf(row.get("start_time")));
+            timePair.add(String.valueOf(row.get("end_time")));
+            result.add(timePair);
+        }
 
-		Time startSqlTime = Time.valueOf(startTime);
+        return result;
+    }
 
-		Time endSqlTime = Time.valueOf(endTime);
+    // ブース予約登録
+    public void boothBoothRegistration(int bookingId, int boothNumber, LocalTime startTime, LocalTime endTime) {
 
-		MapSqlParameterSource param = new MapSqlParameterSource()
-				.addValue("bookingId", bookingId)
-				.addValue("boothNumber", boothNumber)
-				.addValue("startTime", startSqlTime)
-				.addValue("endTime", endSqlTime)
-				.addValue("is_check", false);
+        String sql = "INSERT INTO booth (booking_id, booth_number, start_time, end_time, is_check) "
+                + "VALUES (:bookingId, :boothNumber, :startTime, :endTime, :is_check)";
 
-		namedParameterJdbcTemplate.update(sql, param);
+        Time startSqlTime = Time.valueOf(startTime);
+        Time endSqlTime = Time.valueOf(endTime);
 
-	}
+        MapSqlParameterSource param = new MapSqlParameterSource()
+                .addValue("bookingId", bookingId)
+                .addValue("boothNumber", boothNumber)
+                .addValue("startTime", startSqlTime)
+                .addValue("endTime", endSqlTime)
+                .addValue("is_check", false);
+
+        namedParameterJdbcTemplate.update(sql, param);
+    }
 
 }
