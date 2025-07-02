@@ -242,8 +242,8 @@ public class KRCBookingController {
         headers.set("Content-Type", "application/json");
         headers.set("Authorization", "Bearer " + channelToken);
 
-        String urlExplanation = "https://newly-uncommon-quetzal.ngrok-free.app/explanation?lineId=" + userId;
-        String urlRegister = "https://newly-uncommon-quetzal.ngrok-free.app/createForm?lineId=" + userId;
+        String urlExplanation = "https://krcbooking.onrender.com/explanation?lineId=" + userId;
+        String urlRegister = "https://krcbooking.onrender.com/createForm?lineId=" + userId;
 
         // LINE IDが既に存在するか確認（登録済みならtrue）
         boolean userExists = usersRepository.findByLineId(userId) != null;
