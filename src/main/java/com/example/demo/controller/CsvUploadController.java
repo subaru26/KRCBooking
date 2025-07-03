@@ -55,11 +55,7 @@ public class CsvUploadController {
 			return "error"; // エラー画面へ
 		}
 
-		return "redirect:/success"; // 成功画面へリダイレクト
+		return "success"; // 成功画面へリダイレクト
 	}
 
-	@PostMapping("/success")
-	public String showSuccess() {
-		return "success"; // 成功画面のテンプレート名
-	}
 }
