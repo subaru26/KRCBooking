@@ -59,16 +59,15 @@ public class BoothDetailRepository {
         );
     }
 
-    // 重複時にスキップしてブースを登録
-    public void insertBoothPlace(int boothNumber, String boothPlace) {
+    // 重複時にスキップしてブースを登録（booth_numberは自動採番）
+    public void insertBoothPlace(String boothPlace) {
         String sql = """
-            INSERT INTO booth_detail (booth_number, booth_place)
-            VALUES (:boothNumber, :boothPlace)
-            ON CONFLICT (booth_number) DO NOTHING
+            INSERT INTO booth_detail (booth_place)
+            VALUES (:boothPlace)
+            ON CONFLICT (booth_place) DO NOTHING
         """;
 
         MapSqlParameterSource param = new MapSqlParameterSource()
-                .addValue("boothNumber", boothNumber)
                 .addValue("boothPlace", boothPlace);
 
         namedParameterJdbcTemplate.update(sql, param);

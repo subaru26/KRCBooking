@@ -40,11 +40,8 @@ public class AdminController {
     public String boothInsert(String building, String floor, String number) {
         String boothPlace = building + "_" + floor + "_" + number;
 
-        // booth_numberを連番で生成（例: floorとnumberを連結したint）
-        int boothNumber = Integer.parseInt(floor + number);
-
         // 重複時スキップで登録
-        boothDetailRepository.insertBoothPlace(boothNumber, boothPlace);
+        boothDetailRepository.insertBoothPlace(boothPlace);
 
         return "boothOk";
     }
